@@ -83,7 +83,7 @@ export function calculateTotalXp(level, currentXp = 0) {
   return total;
 }
 
-export async function getLeaderboard(client, guildId, limit = 10) {
+export async function getLeaderboard(client, guildId, limit = 1000) {
   try {
     
     if (!guildId || typeof guildId !== 'string') {
@@ -94,7 +94,7 @@ export async function getLeaderboard(client, guildId, limit = 10) {
       );
     }
 
-    if (!Number.isInteger(limit) || limit < 1 || limit > 100) {
+    if (!Number.isInteger(limit) || limit < -1 || limit > 10000) {
       limit = Math.min(Math.max(limit, 1), 100);
     }
 
