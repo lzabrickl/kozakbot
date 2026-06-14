@@ -82,22 +82,25 @@ export default {
         
         if (welcomeConfig?.roleIds && welcomeConfig.roleIds.length > 0) {
             const delay = welcomeConfig.autoRoleDelay || 0;
-            const singleRoleId = welcomeConfig.roleIds[0];
-            
+
             if (delay > 0) {
                 const timeout = setTimeout(async () => {
-                    const role = guild.roles.cache.get(singleRoleId);
-                    if (role) {
-                        await assignRoleSafely(member, role);
+                    for (const roleId of welcomeConfig.roleIds) {
+                        const role = guild.roles.cache.get(roleId);
+                        if (role) {
+                            await assignRoleSafely(member, role);
+                        }
                     }
                 }, delay * 1000);
                 if (typeof timeout.unref === 'function') {
                     timeout.unref();
                 }
             } else {
-                const role = guild.roles.cache.get(singleRoleId);
-                if (role) {
-                    await assignRoleSafely(member, role);
+                for (const roleId of welcomeConfig.roleIds) {
+                    const role = guild.roles.cache.get(roleId);
+                    if (role) {
+                        await assignRoleSafely(member, role);
+                    }
                 }
             }
         }
