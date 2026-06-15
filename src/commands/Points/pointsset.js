@@ -7,13 +7,13 @@ import { SlashCommandBuilder, PermissionFlagsBits, EmbedBuilder, MessageFlags } 
 import { logger } from '../../utils/logger.js';
 import { handleInteractionError, TitanBotError, ErrorTypes } from '../../utils/errorHandler.js';
 import { checkUserPermissions } from '../../utils/permissionGuard.js';
-import { setUserLevel, getLevelingConfig } from '../../services/leveling.js';
+import { setUserLevel, getLevelingConfig } from '../../services/points.js';
 import { createEmbed } from '../../utils/embeds.js';
 
 import { InteractionHelper } from '../../utils/interactionHelper.js';
 export default {
   data: new SlashCommandBuilder()
-    .setName('levelset')
+    .setName('pointsset')
     .setDescription("Set a user's level to a specific value")
     .addUserOption((option) =>
       option
@@ -30,7 +30,7 @@ export default {
     )
     .setDefaultMemberPermissions(PermissionFlagsBits.ManageGuild)
     .setDMPermission(false),
-  category: 'Leveling',
+  category: 'Points',
 
   
 
@@ -56,7 +56,7 @@ export default {
           embeds: [
             new EmbedBuilder()
               .setColor('#f1c40f')
-              .setDescription('The leveling system is currently disabled on this server.')
+              .setDescription('The points system is currently disabled on this server.')
           ],
           flags: MessageFlags.Ephemeral
         });
@@ -83,7 +83,7 @@ export default {
         embeds: [
           createEmbed({
             title: '✅ Level Set',
-            description: `Successfully set ${targetUser.tag}'s level to **${newLevel}**.\n**Total XP:** ${userData.totalXp}`,
+            description: `Successfully set ${targetUser.tag}'s level to **${newLevel}**.\n**Total Points:** ${userData.totalXp}`,
             color: 'success'
           })
         ]
@@ -93,10 +93,10 @@ export default {
         `[ADMIN] User ${interaction.user.tag} set ${targetUser.tag}'s level to ${newLevel} in guild ${interaction.guildId}`
       );
     } catch (error) {
-      logger.error('LevelSet command error:', error);
+      logger.error('PointsSet command error:', error);
       await handleInteractionError(interaction, error, {
         type: 'command',
-        commandName: 'levelset'
+        commandName: 'pointsset'
       });
     }
   }

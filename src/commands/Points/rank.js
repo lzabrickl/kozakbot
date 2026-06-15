@@ -6,7 +6,7 @@
 import { SlashCommandBuilder, EmbedBuilder, MessageFlags } from 'discord.js';
 import { logger } from '../../utils/logger.js';
 import { handleInteractionError, TitanBotError, ErrorTypes } from '../../utils/errorHandler.js';
-import { getUserLevelData, getLevelingConfig, getXpForLevel } from '../../services/leveling.js';
+import { getUserLevelData, getLevelingConfig, getXpForLevel } from '../../services/points.js';
 
 import { InteractionHelper } from '../../utils/interactionHelper.js';
 export default {
@@ -20,7 +20,7 @@ export default {
         .setRequired(false)
     )
     .setDMPermission(false),
-  category: 'Leveling',
+  category: 'Points',
 
   
 
@@ -38,7 +38,7 @@ export default {
           embeds: [
             new EmbedBuilder()
               .setColor('#f1c40f')
-              .setDescription('The leveling system is currently disabled on this server.')
+              .setDescription('The points system is currently disabled on this server.')
           ],
           flags: MessageFlags.Ephemeral
         });
@@ -80,12 +80,12 @@ export default {
             inline: true
           },
           {
-            name: '⭐ XP',
+            name: '⭐ Points',
             value: `${safeUserData.xp}/${xpNeeded}`,
             inline: true
           },
           {
-            name: '✨ Total XP',
+            name: '✨ Total Points',
             value: safeUserData.totalXp.toString(),
             inline: true
           },

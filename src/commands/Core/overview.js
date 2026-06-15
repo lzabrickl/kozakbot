@@ -2,7 +2,7 @@ import { SlashCommandBuilder, EmbedBuilder, PermissionFlagsBits } from 'discord.
 import { getColor } from '../../config/bot.js';
 import { getGuildConfig } from '../../services/guildConfig.js';
 import { getLoggingStatus } from '../../services/loggingService.js';
-import { getLevelingConfig } from '../../services/leveling.js';
+import { getLevelingConfig } from '../../services/points.js';
 import { getConfiguration as getJoinToCreateConfiguration } from '../../services/joinToCreateService.js';
 import { getWelcomeConfig, getApplicationSettings } from '../../utils/database.js';
 import { errorEmbed } from '../../utils/embeds.js';
@@ -70,7 +70,7 @@ export default {
                         name: '⚙️ Core Systems',
                         value: [
                             `🧾 **Audit Logging** — ${pill(Boolean(loggingStatus.enabled))}`,
-                            `📈 **Leveling** — ${pill(Boolean(levelingConfig?.enabled))}`,
+                            `📈 **Points** — ${pill(Boolean(levelingConfig?.enabled))}`,
                             `👋 **Welcome** — ${pill(Boolean(welcomeConfig?.enabled))}`,
                             `👋 **Goodbye** — ${pill(Boolean(welcomeConfig?.goodbyeEnabled))}`,
                             `🎂 **Birthdays** — ${pill(Boolean(guildConfig.birthdayChannelId))}`,

@@ -7,13 +7,13 @@ import { SlashCommandBuilder, PermissionFlagsBits, EmbedBuilder, MessageFlags } 
 import { logger } from '../../utils/logger.js';
 import { handleInteractionError, TitanBotError, ErrorTypes } from '../../utils/errorHandler.js';
 import { checkUserPermissions } from '../../utils/permissionGuard.js';
-import { removeLevels, getUserLevelData, getLevelingConfig } from '../../services/leveling.js';
+import { removeLevels, getUserLevelData, getLevelingConfig } from '../../services/points.js';
 import { createEmbed } from '../../utils/embeds.js';
 
 import { InteractionHelper } from '../../utils/interactionHelper.js';
 export default {
   data: new SlashCommandBuilder()
-    .setName('levelremove')
+    .setName('pointsremove')
     .setDescription('Remove levels from a user')
     .addUserOption((option) =>
       option
@@ -30,7 +30,7 @@ export default {
     )
     .setDefaultMemberPermissions(PermissionFlagsBits.ManageGuild)
     .setDMPermission(false),
-  category: 'Leveling',
+  category: 'Points',
 
   
 
@@ -56,7 +56,7 @@ export default {
           embeds: [
             new EmbedBuilder()
               .setColor('#f1c40f')
-              .setDescription('The leveling system is currently disabled on this server.')
+              .setDescription('The points system is currently disabled on this server.')
           ],
           flags: MessageFlags.Ephemeral
         });
@@ -103,10 +103,10 @@ export default {
         `[ADMIN] User ${interaction.user.tag} removed ${levelsToRemove} levels from ${targetUser.tag} in guild ${interaction.guildId}`
       );
     } catch (error) {
-      logger.error('LevelRemove command error:', error);
+      logger.error('PointsRemove command error:', error);
       await handleInteractionError(interaction, error, {
         type: 'command',
-        commandName: 'levelremove'
+        commandName: 'pointsremove'
       });
     }
   }

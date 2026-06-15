@@ -5,7 +5,7 @@
 
 import { EmbedBuilder } from 'discord.js';
 import { logger } from '../utils/logger.js';
-import { getGuildConfig, setGuildConfig } from '../services/guildConfig.js';
+import { getGuildConfig, setGuildConfig } from './guildConfig.js';
 import { TitanBotError, ErrorTypes } from '../utils/errorHandler.js';
 
 const BASE_XP = 100;

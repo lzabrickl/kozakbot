@@ -5,7 +5,7 @@ import { formatWelcomeMessage } from '../utils/welcome.js';
 import { logEvent, EVENT_TYPES } from '../services/loggingService.js';
 import { getServerCounters, updateCounter } from '../services/serverstatsService.js';
 import { getGuildBirthdays, deleteBirthday } from '../utils/database.js';
-import { deleteUserLevelData } from '../services/leveling.js';
+import { deleteUserLevelData } from '../services/points.js';
 import { logger } from '../utils/logger.js';
 
 export default {
@@ -150,12 +150,12 @@ export default {
             logger.debug('Error handling applications on member leave:', error);
         }
 
-        // Remove leveling data when a member leaves
+        // Remove points data when a member leaves
         try {
             await deleteUserLevelData(member.client, guild.id, user.id);
-            logger.debug(`Removed leveling data for user ${user.id} in guild ${guild.id}`);
+            logger.debug(`Removed points data for user ${user.id} in guild ${guild.id}`);
         } catch (error) {
-            logger.debug('Error handling leveling data on member leave:', error);
+            logger.debug('Error handling points data on member leave:', error);
         }
         
     } catch (error) {

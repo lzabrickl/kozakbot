@@ -6,7 +6,7 @@
 import { SlashCommandBuilder, EmbedBuilder, MessageFlags } from 'discord.js';
 import { logger } from '../../utils/logger.js';
 import { handleInteractionError, TitanBotError, ErrorTypes } from '../../utils/errorHandler.js';
-import { getLeaderboard, getLevelingConfig, getXpForLevel } from '../../services/leveling.js';
+import { getLeaderboard, getLevelingConfig, getXpForLevel } from '../../services/points.js';
 
 import { InteractionHelper } from '../../utils/interactionHelper.js';
 export default {
@@ -14,7 +14,7 @@ export default {
     .setName('leaderboard')
     .setDescription("Shows the server's level leaderboard")
     .setDMPermission(false),
-  category: 'Leveling',
+  category: 'Points',
 
   
 
@@ -33,7 +33,7 @@ export default {
           embeds: [
             new EmbedBuilder()
               .setColor('#f1c40f')
-              .setDescription('The leveling system is currently disabled on this server.')
+              .setDescription('The points system is currently disabled on this server.')
           ],
           flags: MessageFlags.Ephemeral
         });
@@ -46,14 +46,14 @@ export default {
         throw new TitanBotError(
           'No leaderboard data found',
           ErrorTypes.DATABASE,
-          'No level data found yet. Start chatting to gain XP!'
+          'No points data found yet.'
         );
       }
 
       const embed = new EmbedBuilder()
-        .setTitle('🏆 Level Leaderboard')
+        .setTitle('🏆 Points Leaderboard')
         .setColor('#2ecc71')
-        .setDescription("Top 10 most active members in this server:")
+        .setDescription("Top 10 members by points in this server:")
         .setTimestamp();
 
       const leaderboardText = await Promise.all(
@@ -69,7 +69,7 @@ export default {
             else if (index === 2) rankPrefix = '🥉';
             else rankPrefix = `**${index + 1}.**`;
 
-            return `${rankPrefix} ${userMention} - Level ${user.level} (${user.xp}/${xpForNextLevel} XP)`;
+            return `${rankPrefix} ${userMention} - Level ${user.level} (${user.xp}/${xpForNextLevel} pts)`;
           } catch {
             return `**${index + 1}.** Error loading user ${user.userId}`;
           }

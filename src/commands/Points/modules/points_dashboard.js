@@ -20,7 +20,7 @@ import { InteractionHelper } from '../../../utils/interactionHelper.js';
 import { successEmbed, errorEmbed } from '../../../utils/embeds.js';
 import { logger } from '../../../utils/logger.js';
 import { TitanBotError, ErrorTypes } from '../../../utils/errorHandler.js';
-import { getLevelingConfig, saveLevelingConfig } from '../../../services/leveling.js';
+import { getLevelingConfig, saveLevelingConfig } from '../../../services/points.js';
 import { botHasPermission } from '../../../utils/permissionGuard.js';
 
 // ─── Embed & Menu Builders ────────────────────────────────────────────────────
@@ -45,15 +45,15 @@ function buildDashboardEmbed(cfg, guild) {
     const ignoredRoValue = ignoredRoles.length > 0 ? ignoredRoles.map(id => `<@&${id}>`).join(', ') : '`None`';
 
     return new EmbedBuilder()
-        .setTitle('📊 Leveling System Dashboard')
-        .setDescription(`Manage leveling settings for **${guild.name}**.\nSelect an option below to modify a setting.`)
+        .setTitle('📊 Points System Dashboard')
+        .setDescription(`Manage points settings for **${guild.name}**.\nSelect an option below to modify a setting.`)
         .setColor(getColor('info'))
         .addFields(
             { name: '📢 Level-up Channel', value: channel, inline: true },
             { name: '⚙️ System Status', value: cfg.enabled ? '✅ **Enabled**' : '❌ **Disabled**', inline: true },
             { name: '📣 Announcements', value: cfg.announceLevelUp !== false ? '✅ **Enabled**' : '❌ **Disabled**', inline: true },
-            { name: '🎲 XP per Message', value: `\`${xpMin} – ${xpMax}\``, inline: true },
-            { name: '⏱️ XP Cooldown', value: `\`${cooldown}s\``, inline: true },
+            { name: '🎲 Points per Message', value: `\`${xpMin} – ${xpMax}\``, inline: true },
+            { name: '⏱️ Points Cooldown', value: `\`${cooldown}s\``, inline: true },
             { name: '\u200B', value: '\u200B', inline: true },
             { name: '💬 Level-up Message', value: msgPreview, inline: false },
             { name: '🏆 Role Rewards', value: rewardsValue, inline: false },
@@ -80,13 +80,13 @@ function buildSelectMenu(guildId) {
                 .setValue('message')
                 .setEmoji('💬'),
             new StringSelectMenuOptionBuilder()
-                .setLabel('Set XP Range')
-                .setDescription('Set the minimum and maximum XP rewarded per message')
+                .setLabel('Set Points Range')
+                .setDescription('Set the minimum and maximum points rewarded per message')
                 .setValue('xp_range')
                 .setEmoji('🎲'),
             new StringSelectMenuOptionBuilder()
-                .setLabel('Set XP Cooldown')
-                .setDescription('Seconds between XP grants for the same user')
+                .setLabel('Set Points Cooldown')
+                .setDescription('Seconds between point grants for the same user')
                 .setValue('xp_cooldown')
                 .setEmoji('⏱️'),
             new StringSelectMenuOptionBuilder()
@@ -124,7 +124,7 @@ function buildButtonRow(cfg, guildId, disabled = false) {
             .setDisabled(disabled),
         new ButtonBuilder()
             .setCustomId(`level_cfg_toggle_system_${guildId}`)
-            .setLabel('Leveling')
+            .setLabel('Points')
             .setStyle(systemOn ? ButtonStyle.Success : ButtonStyle.Danger)
             .setEmoji('⚡')
             .setDisabled(disabled),
@@ -154,9 +154,9 @@ export default {
 
             if (!cfg.configured) {
                 throw new TitanBotError(
-                    'Leveling system not configured',
+                    'Points system not configured',
                     ErrorTypes.CONFIGURATION,
-                    'The leveling system has not been set up yet. Run `/level setup` first to configure it.',
+                    'The points system has not been set up yet. Run `/points setup` first to configure it.',
                 );
             }
 
@@ -206,9 +206,9 @@ export default {
                     }
                 } catch (error) {
                     if (error instanceof TitanBotError) {
-                        logger.debug(`Leveling config validation error: ${error.message}`);
+                        logger.debug(`Points config validation error: ${error.message}`);
                     } else {
-                        logger.error('Unexpected leveling dashboard error:', error);
+                        logger.error('Unexpected points dashboard error:', error);
                     }
 
                     const errorMessage =
@@ -268,7 +268,7 @@ export default {
                         embeds: [
                             successEmbed(
                                 '✅ System Updated',
-                                `The leveling system is now **${cfg.enabled ? 'enabled' : 'disabled'}**.${!cfg.enabled ? '\nUsers will not earn XP until the system is re-enabled.' : ''}`,
+                                `The points system is now **${cfg.enabled ? 'enabled' : 'disabled'}**.`,
                             ),
                         ],
                         flags: MessageFlags.Ephemeral,
@@ -308,11 +308,11 @@ export default {
             });
         } catch (error) {
             if (error instanceof TitanBotError) throw error;
-            logger.error('Unexpected error in level_dashboard:', error);
+            logger.error('Unexpected error in points_dashboard:', error);
             throw new TitanBotError(
-                `Level dashboard failed: ${error.message}`,
+                `Points dashboard failed: ${error.message}`,
                 ErrorTypes.UNKNOWN,
-                'Failed to open the leveling dashboard.',
+                'Failed to open the points dashboard.',
             );
         }
     },
@@ -696,12 +696,12 @@ async function handleXpRange(selectInteraction, rootInteraction, cfg, guildId, c
 
     const modal = new ModalBuilder()
         .setCustomId('level_cfg_xp_range')
-        .setTitle('Set XP Range per Message')
+        .setTitle('Set Points Range per Message')
         .addComponents(
             new ActionRowBuilder().addComponents(
                 new TextInputBuilder()
                     .setCustomId('xp_min_input')
-                    .setLabel('Minimum XP (1–500)')
+                    .setLabel('Minimum Points (1–500)')
                     .setStyle(TextInputStyle.Short)
                     .setValue(String(currentMin))
                     .setMaxLength(3)
@@ -712,7 +712,7 @@ async function handleXpRange(selectInteraction, rootInteraction, cfg, guildId, c
             new ActionRowBuilder().addComponents(
                 new TextInputBuilder()
                     .setCustomId('xp_max_input')
-                    .setLabel('Maximum XP (1–500)')
+                    .setLabel('Maximum Points (1–500)')
                     .setStyle(TextInputStyle.Short)
                     .setValue(String(currentMax))
                     .setMaxLength(3)
@@ -742,7 +742,7 @@ async function handleXpRange(selectInteraction, rootInteraction, cfg, guildId, c
     if (isNaN(newMin) || isNaN(newMax) || newMin < 1 || newMax < 1 || newMin > 500 || newMax > 500) {
         await submitted.reply({
             embeds: [
-                errorEmbed('Invalid Values', 'Both XP values must be whole numbers between **1** and **500**.'),
+                errorEmbed('Invalid Values', 'Both point values must be whole numbers between **1** and **500**.'),
             ],
             flags: MessageFlags.Ephemeral,
         });
@@ -765,8 +765,8 @@ async function handleXpRange(selectInteraction, rootInteraction, cfg, guildId, c
     await submitted.reply({
         embeds: [
             successEmbed(
-                '✅ XP Range Updated',
-                `Users will now earn between **${newMin}** and **${newMax}** XP per message.`,
+                '✅ Points Range Updated',
+                `Users will now earn between **${newMin}** and **${newMax}** points per message.`,
             ),
         ],
         flags: MessageFlags.Ephemeral,
@@ -780,7 +780,7 @@ async function handleXpRange(selectInteraction, rootInteraction, cfg, guildId, c
 async function handleXpCooldown(selectInteraction, rootInteraction, cfg, guildId, client) {
     const modal = new ModalBuilder()
         .setCustomId('level_cfg_cooldown')
-        .setTitle('Set XP Cooldown')
+        .setTitle('Set Points Cooldown')
         .addComponents(
             new ActionRowBuilder().addComponents(
                 new TextInputBuilder()
@@ -830,7 +830,7 @@ async function handleXpCooldown(selectInteraction, rootInteraction, cfg, guildId
         embeds: [
             successEmbed(
                 '✅ Cooldown Updated',
-                `XP cooldown set to **${newCooldown} second${newCooldown !== 1 ? 's' : ''}**.${newCooldown === 0 ? '\n> ⚠️ A cooldown of 0 means XP is granted on every message.' : ''}`,
+                `Points cooldown set to **${newCooldown} second${newCooldown !== 1 ? 's' : ''}**.`,
             ),
         ],
         flags: MessageFlags.Ephemeral,
