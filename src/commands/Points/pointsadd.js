@@ -1,38 +1,30 @@
 import { SlashCommandBuilder, PermissionFlagsBits, EmbedBuilder, MessageFlags } from 'discord.js';
 import { logger } from '../../utils/logger.js';
-import { handleInteractionError, TitanBotError, ErrorTypes } from '../../utils/errorHandler.js';
+import { handleInteractionError } from '../../utils/errorHandler.js';
 import { checkUserPermissions } from '../../utils/permissionGuard.js';
 import { addLevels, getLevelingConfig } from '../../services/points.js';
 import { createEmbed } from '../../utils/embeds.js';
 import { InteractionHelper } from '../../utils/interactionHelper.js';
 
-const MAX_USERS = 5;
-
-function buildUserOptions(builder) {
-    for (let i = 1; i <= MAX_USERS; i++) {
-        builder.addUserOption(option =>
-            option
-                .setName(i === 1 ? 'user' : `user${i}`)
-                .setDescription(i === 1 ? 'User to add points to' : `Additional user to add points to`)
-                .setRequired(i === 1)
-        );
-    }
-    return builder;
-}
+const USER_MENTION_RE = /<@!?(\d+)>/g;
 
 export default {
-    data: buildUserOptions(
-        new SlashCommandBuilder()
-            .setName('pointsadd')
-            .setDescription('Add points to one or more users')
-            .addIntegerOption(option =>
-                option
-                    .setName('points')
-                    .setDescription('Number of points to add')
-                    .setRequired(true)
-                    .setMinValue(1)
-            )
-    )
+    data: new SlashCommandBuilder()
+        .setName('pointsadd')
+        .setDescription('Add points to one or more users')
+        .addStringOption(option =>
+            option
+                .setName('users')
+                .setDescription('Mention the users to add points to (e.g. @Alice @Bob @Charlie)')
+                .setRequired(true)
+        )
+        .addIntegerOption(option =>
+            option
+                .setName('points')
+                .setDescription('Number of points to add to each user')
+                .setRequired(true)
+                .setMinValue(1)
+        )
         .setDefaultMemberPermissions(PermissionFlagsBits.ManageGuild)
         .setDMPermission(false),
     category: 'Points',
@@ -61,29 +53,35 @@ export default {
             }
 
             const pointsToAdd = interaction.options.getInteger('points');
+            const usersInput = interaction.options.getString('users');
 
-            const targetUsers = [];
-            for (let i = 1; i <= MAX_USERS; i++) {
-                const user = interaction.options.getUser(i === 1 ? 'user' : `user${i}`);
-                if (user && !targetUsers.some(u => u.id === user.id)) {
-                    targetUsers.push(user);
-                }
+            const userIds = [...new Set([...usersInput.matchAll(USER_MENTION_RE)].map(m => m[1]))];
+
+            if (userIds.length === 0) {
+                return InteractionHelper.safeEditReply(interaction, {
+                    embeds: [
+                        new EmbedBuilder()
+                            .setColor('#e74c3c')
+                            .setDescription('No valid user mentions found. Please @mention at least one user.')
+                    ],
+                    flags: MessageFlags.Ephemeral
+                });
             }
 
             const results = [];
-            for (const user of targetUsers) {
-                const member = await interaction.guild.members.fetch(user.id).catch(() => null);
+            for (const userId of userIds) {
+                const member = await interaction.guild.members.fetch(userId).catch(() => null);
                 if (!member) {
-                    results.push(`⚠️ ${user} — not found in this server, skipped.`);
+                    results.push(`⚠️ <@${userId}> — not found in this server, skipped.`);
                     continue;
                 }
                 try {
-                    const userData = await addLevels(client, interaction.guildId, user.id, pointsToAdd);
-                    results.push(`✅ ${user} — **${pointsToAdd}** points added (total: **${userData.level}**)`);
-                    logger.info(`[ADMIN] ${interaction.user.tag} added ${pointsToAdd} points to ${user.tag} in guild ${interaction.guildId}`);
+                    const userData = await addLevels(client, interaction.guildId, userId, pointsToAdd);
+                    results.push(`✅ <@${userId}> — **${pointsToAdd}** points added (total: **${userData.level}**)`);
+                    logger.info(`[ADMIN] ${interaction.user.tag} added ${pointsToAdd} points to ${member.user.tag} in guild ${interaction.guildId}`);
                 } catch (err) {
-                    results.push(`❌ ${user} — failed: ${err.userMessage ?? err.message}`);
-                    logger.error(`Failed to add points to ${user.id}:`, err);
+                    results.push(`❌ <@${userId}> — failed: ${err.userMessage ?? err.message}`);
+                    logger.error(`Failed to add points to ${userId}:`, err);
                 }
             }
 
