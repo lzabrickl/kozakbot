@@ -92,10 +92,6 @@ export async function getLeaderboard(client, guildId, limit = 1000) {
       );
     }
 
-    if (!Number.isInteger(limit) || limit < 1 || limit > 100) {
-      limit = Math.min(Math.max(limit, 1), 100);
-    }
-
     const guild = client.guilds.cache.get(guildId);
     if (!guild) {
       logger.warn(`Guild ${guildId} not found in cache`);
@@ -127,7 +123,7 @@ export async function getLeaderboard(client, guildId, limit = 1000) {
       entry.rank = index + 1;
     });
     
-    return leaderboard.slice(0, limit);
+    return leaderboard;
     
   } catch (error) {
     logger.error('Error getting leaderboard:', error);
