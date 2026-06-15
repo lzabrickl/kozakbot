@@ -448,12 +448,9 @@ export async function removeLevels(client, guildId, userId, levels) {
     const userData = await getUserLevelData(client, guildId, userId);
     const newLevel = Math.max(MIN_LEVEL, userData.level - levels);
 
-    const newXp = 0;
-    const newTotalXp = calculateTotalXp(newLevel, newXp);
-
     userData.level = newLevel;
-    userData.xp = newXp;
-    userData.totalXp = newTotalXp;
+    userData.xp = 0;
+    userData.totalXp = calculateTotalXp(newLevel, 0);
 
     await saveUserLevelData(client, guildId, userId, userData);
     

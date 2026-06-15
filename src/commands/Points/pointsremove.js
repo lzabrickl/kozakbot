@@ -78,11 +78,11 @@ export default {
 
       
       const userData = await getUserLevelData(client, interaction.guildId, targetUser.id);
-      if (userData.level === 0) {
+      if (userData.totalXp === 0 && userData.level === 0) {
         throw new TitanBotError(
-          `User ${targetUser.id} is already at minimum level`,
+          `User ${targetUser.id} already has 0 points`,
           ErrorTypes.VALIDATION,
-          `${targetUser.tag} is already at level 0 and cannot have levels removed.`
+          `${targetUser.tag} already has 0 points and cannot have points removed.`
         );
       }
 
@@ -92,8 +92,8 @@ export default {
       await InteractionHelper.safeEditReply(interaction, {
         embeds: [
           createEmbed({
-            title: '✅ Levels Removed',
-            description: `Successfully removed ${levelsToRemove} levels from ${targetUser.tag}.\n**New Level:** ${updatedData.level}`,
+            title: '✅ Points Removed',
+            description: `Successfully removed ${levelsToRemove} points from ${targetUser.tag}.\n**New Total:** ${updatedData.level}`,
             color: 'success'
           })
         ]
