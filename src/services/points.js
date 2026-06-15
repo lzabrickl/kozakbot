@@ -113,14 +113,12 @@ export async function getLeaderboard(client, guildId, limit = 1000) {
       if (member.user.bot) continue;
       
       const data = await getUserLevelData(client, guildId, userId);
-      if (data && (data.totalXp > 0 || data.level > 0)) {
-        leaderboard.push({
-          userId,
-          username: member.user.username,
-          discriminator: member.user.discriminator,
-          ...data
-        });
-      }
+      leaderboard.push({
+        userId,
+        username: member.user.username,
+        discriminator: member.user.discriminator,
+        ...data
+      });
     }
     
     leaderboard.sort((a, b) => b.totalXp - a.totalXp);

@@ -5,7 +5,7 @@
 
 import { SlashCommandBuilder, EmbedBuilder, MessageFlags } from 'discord.js';
 import { logger } from '../../utils/logger.js';
-import { handleInteractionError, TitanBotError, ErrorTypes } from '../../utils/errorHandler.js';
+import { handleInteractionError } from '../../utils/errorHandler.js';
 import { getLeaderboard, getLevelingConfig } from '../../services/points.js';
 
 import { InteractionHelper } from '../../utils/interactionHelper.js';
@@ -41,14 +41,6 @@ export default {
       }
 
       const leaderboard = await getLeaderboard(client, interaction.guildId, 10);
-
-      if (leaderboard.length === 0) {
-        throw new TitanBotError(
-          'No leaderboard data found',
-          ErrorTypes.DATABASE,
-          'No points data found yet.'
-        );
-      }
 
       const embed = new EmbedBuilder()
         .setTitle('🏆 Points Leaderboard')
