@@ -10,7 +10,7 @@ import { TitanBotError, ErrorTypes } from '../utils/errorHandler.js';
 
 const BASE_XP = 100;
 const XP_MULTIPLIER = 1.5;
-const MAX_LEVEL = 1000;
+const MAX_LEVEL = 5000;
 const MIN_LEVEL = 0;
 
 
