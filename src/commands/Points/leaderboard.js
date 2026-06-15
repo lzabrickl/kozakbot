@@ -72,33 +72,30 @@ export default {
             let page = 0;
 
             const { embed, row } = buildPage(leaderboard, page, totalPages);
-            const reply = await InteractionHelper.safeEditReply(interaction, {
+            await InteractionHelper.safeEditReply(interaction, {
                 embeds: [embed],
                 components: totalPages > 1 ? [row] : [],
             });
 
             if (totalPages <= 1) return;
 
-            const collector = reply.createMessageComponentCollector({
+            const message = await interaction.fetchReply();
+            const collector = message.createMessageComponentCollector({
                 componentType: ComponentType.Button,
                 filter: i => i.user.id === interaction.user.id && (i.customId === 'lb_prev' || i.customId === 'lb_next'),
                 time: 300_000,
             });
 
             collector.on('collect', async btn => {
-                await btn.deferUpdate().catch(() => null);
                 if (btn.customId === 'lb_prev') page = Math.max(0, page - 1);
                 else page = Math.min(totalPages - 1, page + 1);
 
                 const { embed: newEmbed, row: newRow } = buildPage(leaderboard, page, totalPages);
-                await InteractionHelper.safeEditReply(interaction, {
-                    embeds: [newEmbed],
-                    components: [newRow],
-                });
+                await btn.update({ embeds: [newEmbed], components: [newRow] }).catch(() => null);
             });
 
             collector.on('end', () => {
-                InteractionHelper.safeEditReply(interaction, { components: [] }).catch(() => null);
+                interaction.editReply({ components: [] }).catch(() => null);
             });
 
             logger.debug(`Leaderboard displayed for guild ${interaction.guildId}`);
