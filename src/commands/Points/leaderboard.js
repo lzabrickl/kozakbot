@@ -69,7 +69,7 @@ export default {
             else if (index === 2) rankPrefix = '🥉';
             else rankPrefix = `**${index + 1}.**`;
 
-            return `${rankPrefix} ${userMention} - Points ${user.level} (${user.xp}/${xpForNextLevel} pts)`;
+            return `${rankPrefix} ${userMention} - ${user.totalXp} pts`;
           } catch {
             return `**${index + 1}.** Error loading user ${user.userId}`;
           }
