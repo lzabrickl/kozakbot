@@ -6,7 +6,7 @@
 import { SlashCommandBuilder, EmbedBuilder, MessageFlags } from 'discord.js';
 import { logger } from '../../utils/logger.js';
 import { handleInteractionError, TitanBotError, ErrorTypes } from '../../utils/errorHandler.js';
-import { getLeaderboard, getLevelingConfig, getXpForLevel } from '../../services/points.js';
+import { getLeaderboard, getLevelingConfig } from '../../services/points.js';
 
 import { InteractionHelper } from '../../utils/interactionHelper.js';
 export default {
@@ -61,7 +61,6 @@ export default {
           try {
             const member = await interaction.guild.members.fetch(user.userId).catch(() => null);
             const userMention = member?.user.toString() || `<@${user.userId}>`;
-            const xpForNextLevel = getXpForLevel(user.level + 1);
 
             let rankPrefix = `${index + 1}.`;
             if (index === 0) rankPrefix = '🥇';
