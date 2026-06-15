@@ -7,8 +7,6 @@ import { EmbedBuilder } from 'discord.js';
 import { logger } from '../utils/logger.js';
 import { getGuildConfig, setGuildConfig } from '../services/guildConfig.js';
 import { TitanBotError, ErrorTypes } from '../utils/errorHandler.js';
-import { addXp } from './xpSystem.js';
-
 
 const BASE_XP = 100;
 const XP_MULTIPLIER = 1.5;
