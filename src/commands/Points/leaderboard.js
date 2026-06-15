@@ -87,11 +87,18 @@ export default {
             });
 
             collector.on('collect', async btn => {
-                if (btn.customId === 'lb_prev') page = Math.max(0, page - 1);
-                else page = Math.min(totalPages - 1, page + 1);
+                try {
+                    if (btn.customId === 'lb_prev') page = Math.max(0, page - 1);
+                    else page = Math.min(totalPages - 1, page + 1);
 
-                const { embed: newEmbed, row: newRow } = buildPage(leaderboard, page, totalPages);
-                await btn.update({ embeds: [newEmbed], components: [newRow] }).catch(() => null);
+                    const { embed: newEmbed, row: newRow } = buildPage(leaderboard, page, totalPages);
+                    await btn.update({ embeds: [newEmbed], components: [newRow] });
+                } catch (error) {
+                    logger.error('Leaderboard pagination error:', error);
+                    if (!btn.replied && !btn.deferred) {
+                        await btn.deferUpdate().catch(() => null);
+                    }
+                }
             });
 
             collector.on('end', () => {
