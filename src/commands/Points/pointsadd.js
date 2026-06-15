@@ -14,17 +14,17 @@ import { InteractionHelper } from '../../utils/interactionHelper.js';
 export default {
   data: new SlashCommandBuilder()
     .setName('pointsadd')
-    .setDescription('Add levels to a user')
+    .setDescription('Add points to a user')
     .addUserOption((option) =>
       option
         .setName('user')
-        .setDescription('The user to add levels to')
+        .setDescription('The user to add points to')
         .setRequired(true)
     )
     .addIntegerOption((option) =>
       option
         .setName('levels')
-        .setDescription('Number of levels to add')
+        .setDescription('Number of points to add')
         .setRequired(true)
         .setMinValue(1)
     )
@@ -82,8 +82,8 @@ export default {
       await InteractionHelper.safeEditReply(interaction, {
         embeds: [
           createEmbed({
-            title: '✅ Levels Added',
-            description: `Successfully added ${levelsToAdd} levels to ${targetUser.tag}.\n**New Level:** ${userData.level}`,
+            title: '✅ Points Added',
+            description: `Successfully added ${levelsToAdd} points to ${targetUser.tag}.\n**New Total:** ${userData.level}`,
             color: 'success'
           })
         ]

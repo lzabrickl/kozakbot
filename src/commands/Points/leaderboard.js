@@ -12,7 +12,7 @@ import { InteractionHelper } from '../../utils/interactionHelper.js';
 export default {
   data: new SlashCommandBuilder()
     .setName('leaderboard')
-    .setDescription("Shows the server's level leaderboard")
+    .setDescription("Shows the server's points leaderboard")
     .setDMPermission(false),
   category: 'Points',
 
@@ -69,7 +69,7 @@ export default {
             else if (index === 2) rankPrefix = '🥉';
             else rankPrefix = `**${index + 1}.**`;
 
-            return `${rankPrefix} ${userMention} - Level ${user.level} (${user.xp}/${xpForNextLevel} pts)`;
+            return `${rankPrefix} ${userMention} - Points ${user.level} (${user.xp}/${xpForNextLevel} pts)`;
           } catch {
             return `**${index + 1}.** Error loading user ${user.userId}`;
           }
