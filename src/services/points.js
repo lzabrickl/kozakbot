@@ -117,7 +117,7 @@ export async function getLeaderboard(client, guildId, limit = 1000) {
       });
     }
     
-    leaderboard.sort((a, b) => b.totalXp - a.totalXp);
+    leaderboard.sort((a, b) => b.level - a.level);
     
     leaderboard.forEach((entry, index) => {
       entry.rank = index + 1;

@@ -18,7 +18,7 @@ function buildPage(leaderboard, page, totalPages) {
         else if (rank === 2) prefix = '🥈';
         else if (rank === 3) prefix = '🥉';
         else prefix = `**${rank}.**`;
-        return `${prefix} ${mention} — ${user.totalXp} pts`;
+        return `${prefix} ${mention} — ${user.level} pts`;
     });
 
     const embed = new EmbedBuilder()
